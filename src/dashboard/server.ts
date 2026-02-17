@@ -1,9 +1,15 @@
 import express from "express";
 import path from "path";
 import helmet from "helmet";
+import { timingSafeEqual } from "crypto";
 import { config } from "../config";
 import { setupApiRoutes } from "./api-routes";
 import { apiAuth, rateLimit, parseCookie } from "./middleware";
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 export function createDashboardServer(): express.Express {
   const app = express();
@@ -29,7 +35,7 @@ export function createDashboardServer(): express.Express {
   // Auth endpoints (before static, before auth gate)
   app.post("/api/auth", (req, res) => {
     const token = config.server.dashboardApiToken;
-    if (!token || req.body?.token === token) {
+    if (!token || (req.body?.token && safeCompare(req.body.token, token))) {
       if (token) {
         res.cookie("dashboard_token", token, {
           httpOnly: true,
@@ -54,7 +60,7 @@ export function createDashboardServer(): express.Express {
     const token = config.server.dashboardApiToken;
     if (!token) { next(); return; } // No auth configured (dev)
     const cookieToken = parseCookie(req.headers.cookie || "", "dashboard_token");
-    if (cookieToken === token) { next(); return; }
+    if (cookieToken && safeCompare(cookieToken, token)) { next(); return; }
     res.sendFile(path.join(publicDir, "login.html"));
   });
 

@@ -5,9 +5,14 @@ import { getOverview } from "./channel-overview";
 
 // Parse ISO 8601 duration (PT1H2M3S) to seconds
 function parseDuration(iso: string): number {
-  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return 0;
-  return (parseInt(match[1] || "0") * 3600) + (parseInt(match[2] || "0") * 60) + parseInt(match[3] || "0");
+  let hours = 0, minutes = 0, seconds = 0;
+  const h = iso.match(/(\d+)H/);
+  const m = iso.match(/(\d+)M/);
+  const s = iso.match(/(\d+)S/);
+  if (h) hours = parseInt(h[1], 10);
+  if (m) minutes = parseInt(m[1], 10);
+  if (s) seconds = parseInt(s[1], 10);
+  return hours * 3600 + minutes * 60 + seconds;
 }
 
 // ── Extended Videos (analytics + metadata) ──

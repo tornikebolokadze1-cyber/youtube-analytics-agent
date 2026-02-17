@@ -1,5 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
+import { timingSafeEqual } from "crypto";
 import { config } from "../config";
+
+// Constant-time string comparison to prevent timing attacks
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 // ── Auth middleware ──────────────────────────────────────────
 export function apiAuth(req: Request, res: Response, next: NextFunction): void {
@@ -9,11 +16,11 @@ export function apiAuth(req: Request, res: Response, next: NextFunction): void {
 
   // Accept token via header (programmatic access)
   const provided = req.headers["x-dashboard-token"];
-  if (provided === token) { next(); return; }
+  if (typeof provided === "string" && safeCompare(provided, token)) { next(); return; }
 
   // Accept token via cookie (browser dashboard access)
   const cookieToken = parseCookie(req.headers.cookie || "", "dashboard_token");
-  if (cookieToken === token) { next(); return; }
+  if (cookieToken && safeCompare(cookieToken, token)) { next(); return; }
 
   res.status(401).json({ error: "Unauthorized", message: "Missing or invalid x-dashboard-token header" });
 }
