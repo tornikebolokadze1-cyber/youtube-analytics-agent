@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Pulse Georgia — ანალიტიკა</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+
+  <!-- Mesh Gradient Background -->
+  <div class="mesh-bg"></div>
+
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Ambient Glow Orbs -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header reveal" data-delay="0">
+      <div class="header-left">
+        <div class="logo-icon">
+          <span>AP</span>
+          <div class="logo-ring"></div>
+        </div>
+        <div>
+          <h1 class="gradient-text">AI Pulse Georgia</h1>
+          <p class="subtitle">YouTube Analytics Dashboard &mdash; Claude AI + Gemini + Kimi 2.5</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <label for="periodSelector" class="sr-only">პერიოდი</label>
+        <select class="period-selector" id="periodSelector" aria-label="პერიოდის არჩევა">
+          <option value="7">7 დღე</option>
+          <option value="28" selected>28 დღე</option>
+          <option value="90">90 დღე</option>
+          <option value="365">365 დღე</option>
+        </select>
+        <div class="refresh-indicator">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="lastUpdated" role="status">იტვირთება...</span>
+          <span class="data-lag-hint">~48სთ დაგვიანებით</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Bento Grid -->
+    <section class="kpi-bento" id="kpiGrid">
+      <div class="kpi-card kpi-featured glass-card reveal" data-delay="50">
+        <div class="kpi-icon-wrap accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="kpi-label">ნახვები</div>
+        <div class="kpi-value" id="kpiViews">—</div>
+        <span class="kpi-trend" id="kpiViewsTrend">—</span>
+        <canvas class="kpi-spark" id="sparkViews"></canvas>
+        <div class="card-shine"></div>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="100">
+        <div class="kpi-icon-wrap accent-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-label">ყურების დრო</div>
+        <div class="kpi-value" id="kpiWatchTime">—</div>
+        <span class="kpi-trend" id="kpiWatchTimeTrend">—</span>
+        <div class="kpi-unit">საათი</div>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="150">
+        <div class="kpi-icon-wrap accent-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="kpi-label">გამომწერები</div>
+        <div class="kpi-value" id="kpiSubscribers">—</div>
+        <span class="kpi-trend" id="kpiSubscribersTrend">—</span>
+        <canvas class="kpi-spark" id="sparkSubs"></canvas>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="200">
+        <div class="kpi-icon-wrap accent-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="kpi-label">მოწონებები</div>
+        <div class="kpi-value" id="kpiLikes">—</div>
+        <span class="kpi-trend" id="kpiLikesTrend">—</span>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="250">
+        <div class="kpi-icon-wrap accent-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+        <div class="kpi-label">საშ. ხანგრძლივობა</div>
+        <div class="kpi-value" id="kpiDuration">—</div>
+        <span class="kpi-trend" id="kpiDurationTrend">—</span>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="300">
+        <div class="kpi-icon-wrap accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="kpi-label">კომენტარები</div>
+        <div class="kpi-value" id="kpiComments">—</div>
+        <span class="kpi-trend" id="kpiCommentsTrend">—</span>
+      </div>
+      <div class="kpi-card glass-card reveal" data-delay="350">
+        <div class="kpi-icon-wrap accent-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+        <div class="kpi-label">გაზიარებები</div>
+        <div class="kpi-value" id="kpiShares">—</div>
+        <span class="kpi-trend" id="kpiSharesTrend">—</span>
+      </div>
+    </section>
+
+    <!-- Daily Views & Watch Time Chart -->
+    <section class="card glass-card reveal" data-delay="100" id="dailySection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">ნახვები და ყურების დრო</span></h2>
+        <span class="badge">დღიური</span>
+      </div>
+      <div class="chart-wrap" style="height:360px">
+        <canvas id="viewsChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Subscribers Growth Chart - NEW -->
+    <section class="card glass-card reveal" data-delay="120">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">გამომწერების ზრდა</span></h2>
+        <span class="badge">დღიური</span>
+      </div>
+      <div class="chart-wrap" style="height:300px">
+        <canvas id="subsChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Monthly Historical Chart - NEW -->
+    <section class="card glass-card reveal" data-delay="140">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">თვიური ისტორია</span></h2>
+        <span class="badge">ყველა თვე</span>
+      </div>
+      <div class="chart-wrap" style="height:340px">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Trends Grid -->
+    <section class="card glass-card reveal" data-delay="100" id="trendsSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">ზრდის ტრენდები</span></h2>
+        <span class="badge">წინა პერიოდთან</span>
+      </div>
+      <div id="trendsGrid" class="trends-grid"></div>
+    </section>
+
+    <!-- Top Videos + Traffic -->
+    <section class="bento-row-2-1">
+      <div class="card glass-card reveal" data-delay="100">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">ტოპ ვიდეოები</span></h2>
+          <div class="video-filter-controls">
+            <label for="videoTypeFilter" class="sr-only">ვიდეო ტიპი</label>
+            <select id="videoTypeFilter" class="mini-select" aria-label="ვიდეო ტიპის ფილტრი">
+              <option value="all">ყველა</option>
+              <option value="shorts">Shorts</option>
+              <option value="long">Long-form</option>
+            </select>
+            <span class="badge">ნახვებით</span>
+          </div>
+        </div>
+        <div class="scroll-container" style="max-height:420px">
+          <table class="data-table" id="videosTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>სათაური</th>
+                <th>ნახვები</th>
+                <th>ყურება</th>
+                <th>ჩართ.</th>
+              </tr>
+            </thead>
+            <tbody id="videosBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bento-stack">
+        <div class="card glass-card reveal" data-delay="150">
+          <h2 class="section-title"><span class="gradient-text">ტრაფიკის წყაროები</span></h2>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="trafficChart"></canvas>
+          </div>
+          <div id="trafficDetail" style="display:none"></div>
+        </div>
+        <div class="card glass-card reveal" data-delay="200">
+          <h2 class="section-title"><span class="gradient-text">საძიებო ტერმინები</span></h2>
+          <ul class="search-list" id="searchList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demographics + Geography -->
+    <section class="bento-row-1-1">
+      <div class="card glass-card reveal" data-delay="100">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">დემოგრაფია</span></h2>
+          <span class="badge">ასაკი &times; სქესი</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="demographicsChart"></canvas>
+        </div>
+      </div>
+      <div class="card glass-card reveal" data-delay="150">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">გეოგრაფია</span></h2>
+          <span class="badge">ტოპ ქვეყნები</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="geographyChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Devices + OS + Playback Locations -->
+    <section class="bento-row-3">
+      <div class="card glass-card reveal" data-delay="100">
+        <h2 class="section-title"><span class="gradient-text">მოწყობილობები</span></h2>
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="devicesChart"></canvas>
+        </div>
+      </div>
+      <div class="card glass-card reveal" data-delay="150">
+        <h2 class="section-title"><span class="gradient-text">ოპ. სისტემები</span></h2>
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="osChart"></canvas>
+        </div>
+      </div>
+      <div class="card glass-card reveal" data-delay="200">
+        <h2 class="section-title"><span class="gradient-text">Playback</span></h2>
+        <div class="chart-wrap" style="height:240px">
+          <canvas id="playbackChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subscriber Sources - NEW -->
+    <section class="bento-row-1-1">
+      <div class="card glass-card reveal" data-delay="100">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">გამომწერები ქვეყნებით</span></h2>
+          <span class="badge">ტოპ ქვეყნები</span>
+        </div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="subSourcesChart"></canvas>
+        </div>
+      </div>
+      <div class="card glass-card reveal" data-delay="150">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">ჩართულობა</span></h2>
+          <span class="badge">ლაიქი / კომენტარი / გაზიარება</span>
+        </div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="engagementChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- NEW ADVANCED SECTIONS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <!-- Content Performance Funnel -->
+    <section class="card glass-card reveal" data-delay="100" id="funnelSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">კონტენტის ფუნელი</span></h2>
+        <span class="badge">კონვერსია</span>
+      </div>
+      <div class="funnel-container" id="funnelContainer">
+        <div class="funnel-step" style="--step-color: #00f2ff">
+          <div class="funnel-bar" style="width:100%"></div>
+          <div class="funnel-label">სავარაუდო შთაბეჭდილებები</div>
+          <div class="funnel-value" id="funnelImpressions">—</div>
+        </div>
+        <div class="funnel-arrow">&rarr; <span id="funnelCTR">—</span></div>
+        <div class="funnel-step" style="--step-color: #7b61ff">
+          <div class="funnel-bar" style="width:75%"></div>
+          <div class="funnel-label">ნახვები</div>
+          <div class="funnel-value" id="funnelViews">—</div>
+        </div>
+        <div class="funnel-arrow">&rarr; <span id="funnelEngageRate">—</span></div>
+        <div class="funnel-step" style="--step-color: #10b981">
+          <div class="funnel-bar" style="width:50%"></div>
+          <div class="funnel-label">სავარაუდო ჩართულობა</div>
+          <div class="funnel-value" id="funnelEngaged">—</div>
+        </div>
+        <div class="funnel-arrow">&rarr; <span id="funnelSubRate">—</span></div>
+        <div class="funnel-step" style="--step-color: #f59e0b">
+          <div class="funnel-bar" style="width:25%"></div>
+          <div class="funnel-label">ახალი გამომწერები</div>
+          <div class="funnel-value" id="funnelSubs">—</div>
+        </div>
+      </div>
+      <p class="funnel-note">* ყველა მეტრიკა სავარაუდოა: შთაბეჭდილებები დაფუძნებულია საშუალო 5% CTR-ზე, ჩართულობა — ყურების ხანგრძლივობის მოდელზე</p>
+    </section>
+
+    <!-- Video Performance Scorecard -->
+    <section class="card glass-card reveal" data-delay="100" id="scorecardSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">ვიდეოების სკორქარდი</span></h2>
+        <div class="scorecard-controls">
+          <label for="scorecardType" class="sr-only">სკორქარდის ტიპი</label>
+          <select id="scorecardType" class="mini-select" aria-label="ვიდეო ტიპი">
+            <option value="all">ყველა</option>
+            <option value="shorts">Shorts</option>
+            <option value="long">Long-form</option>
+          </select>
+          <label for="scorecardSort" class="sr-only">სორტირება</label>
+          <select id="scorecardSort" class="mini-select" aria-label="სორტირება">
+            <option value="views">ნახვებით</option>
+            <option value="engagement">ჩართულობით</option>
+            <option value="watchtime">ყურებით</option>
+            <option value="recent">ახალი</option>
+          </select>
+        </div>
+      </div>
+      <div class="scorecard-grid" id="scorecardGrid"></div>
+    </section>
+
+    <!-- Audience Retention Deep Dive -->
+    <section class="card glass-card reveal" data-delay="100" id="retentionSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">აუდიტორიის შეკავება</span></h2>
+        <label for="retentionVideoSelect" class="sr-only">ვიდეოს არჩევა</label>
+        <select id="retentionVideoSelect" class="mini-select" style="max-width:300px" aria-label="ვიდეო შეკავებისთვის">
+          <option value="">აირჩიეთ ვიდეო...</option>
+        </select>
+      </div>
+      <div class="chart-wrap" style="height:300px">
+        <canvas id="retentionChart"></canvas>
+      </div>
+      <div class="retention-stats" id="retentionStats">
+        <div class="retention-stat"><span class="retention-stat-label">Hook Strength (30წმ)</span><span class="retention-stat-value" id="retHook">—</span></div>
+        <div class="retention-stat"><span class="retention-stat-label">შუალედური ვარდნა</span><span class="retention-stat-value" id="retMidDrop">—</span></div>
+        <div class="retention-stat"><span class="retention-stat-label">ბოლომდე ყურება (90%)</span><span class="retention-stat-value" id="retEnd">—</span></div>
+        <div class="retention-stat"><span class="retention-stat-label">რეიტინგი</span><span class="retention-stat-value" id="retRating">—</span></div>
+      </div>
+    </section>
+
+    <!-- Shorts vs Long-form -->
+    <section class="card glass-card reveal" data-delay="100" id="shortsSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">Shorts vs ვიდეო</span></h2>
+        <span class="badge">შედარება</span>
+      </div>
+      <div class="shorts-compare" id="shortsCompare">
+        <div class="shorts-col">
+          <h3 class="shorts-col-title"><span class="badge badge-pink">Shorts (&le;60წმ)</span></h3>
+          <div class="shorts-metrics" id="shortsMetrics"></div>
+        </div>
+        <div class="shorts-divider"></div>
+        <div class="shorts-col">
+          <h3 class="shorts-col-title"><span class="badge badge-purple">Long-form</span></h3>
+          <div class="shorts-metrics" id="longformMetrics"></div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="shortsChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Growth Velocity -->
+    <section class="card glass-card reveal" data-delay="100" id="velocitySection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">ზრდის სიჩქარე</span></h2>
+        <div class="velocity-indicators" id="velocityIndicators"></div>
+      </div>
+      <div class="bento-row-1-1" style="gap:16px">
+        <div class="chart-wrap" style="height:280px">
+          <canvas id="velocitySubsChart"></canvas>
+        </div>
+        <div class="chart-wrap" style="height:280px">
+          <canvas id="velocityViewsChart"></canvas>
+        </div>
+      </div>
+      <div class="velocity-prediction" id="velocityPrediction"></div>
+    </section>
+
+    <!-- Content Topic Analysis -->
+    <section class="card glass-card reveal" data-delay="100" id="topicsSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">თემების ანალიზი</span></h2>
+        <span class="badge">კონტენტის თემები</span>
+      </div>
+      <div class="chart-wrap" style="height:320px">
+        <canvas id="topicsChart"></canvas>
+      </div>
+      <div class="topics-cards" id="topicsCards"></div>
+    </section>
+
+    <!-- Viewer Loyalty -->
+    <section class="bento-row-1-1" id="loyaltySection">
+      <div class="card glass-card reveal" data-delay="100">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">აუდიტორიის ერთგულება</span></h2>
+          <span class="badge">გამომწერი vs სხვა</span>
+        </div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="loyaltyChart"></canvas>
+        </div>
+      </div>
+      <div class="card glass-card reveal" data-delay="150">
+        <div class="card-header">
+          <h2 class="section-title"><span class="gradient-text">ჩართულობა ტიპით</span></h2>
+          <span class="badge">Shorts vs Long-form</span>
+        </div>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="loyaltyEngagementChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Period Comparison -->
+    <section class="card glass-card reveal" data-delay="100" id="compareSection">
+      <div class="card-header">
+        <h2 class="section-title"><span class="gradient-text">პერიოდების შედარება</span></h2>
+        <div class="compare-controls">
+          <label for="compareA" class="sr-only">პერიოდი A</label>
+          <select id="compareA" class="mini-select" aria-label="პირველი პერიოდი">
+            <option value="7">7 დღე</option>
+            <option value="28" selected>28 დღე</option>
+            <option value="90">90 დღე</option>
+          </select>
+          <span class="compare-vs" aria-hidden="true">vs</span>
+          <label for="compareB" class="sr-only">პერიოდი B</label>
+          <select id="compareB" class="mini-select" aria-label="მეორე პერიოდი">
+            <option value="7">7 დღე</option>
+            <option value="28">28 დღე</option>
+            <option value="90" selected>90 დღე</option>
+          </select>
+          <button class="btn-compare" id="btnCompare">შედარება</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:320px">
+        <canvas id="compareChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer reveal" data-delay="50">
+      <button class="btn-refresh" id="btnRefresh" aria-label="მონაცემების განახლება">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        მონაცემების განახლება
+      </button>
+      <p>YouTube Analytics API + <span class="gradient-text">Gemini AI</span> + <span class="gradient-text">Kimi 2.5</span></p>
+      <p><a href="https://youtube.com/@aipulsegeorgia" target="_blank" rel="noopener noreferrer">AI Pulse Georgia</a></p>
+    </footer>
+  </div>
+
+  <!-- Chatbot Toggle -->
+  <button class="chatbot-toggle" id="chatToggle" aria-label="ჩატბოტის გახსნა" type="button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="chat-ripple" aria-hidden="true"></span>
+  </button>
+
+  <!-- Chatbot Panel -->
+  <div class="chatbot" id="chatbot">
+    <div class="chatbot-header">
+      <div class="chatbot-header-info">
+        <div class="chatbot-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+        <div>
+          <div class="chatbot-name">AI Pulse ანალიტიკოსი</div>
+          <div class="chatbot-model">Gemini 3 Pro Preview</div>
+        </div>
+      </div>
+      <button class="chatbot-close" id="chatClose" aria-label="ჩატის დახურვა" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="chatbot-messages scroll-container" id="chatMessages">
+      <div class="chat-msg bot">გამარჯობა! მე ვარ AI Pulse ანალიტიკოსი. მკითხე რაიმე არხის შესახებ ქართულად!</div>
+    </div>
+    <div class="chatbot-input">
+      <label for="chatInput" class="sr-only">ჩატის შეტყობინება</label>
+      <input type="text" id="chatInput" placeholder="დასვი კითხვა..." aria-label="ჩატის შეტყობინება">
+      <button class="send-btn" id="btnSendChat" aria-label="გაგზავნა" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
